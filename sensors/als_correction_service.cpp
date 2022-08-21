@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 using android::base::SetProperty;
+using android::ui::Rotation;
 using android::gui::ScreenCaptureResults;
 using android::ui::DisplayState;
 using android::ui::PixelFormat;
@@ -42,8 +43,13 @@ using android::SurfaceComposerClient;
 
 constexpr int ALS_POS_X = 645;
 constexpr int ALS_POS_Y = 40;
-constexpr int ALS_RADIUS = 64;
+constexpr int ALS_RADIUS = 40;
 constexpr int SCREENSHOT_INTERVAL = 1;
+
+static Rect screenshot_rect(ALS_POS_X - ALS_RADIUS, ALS_POS_Y - ALS_RADIUS, ALS_POS_X + ALS_RADIUS, ALS_POS_Y + ALS_RADIUS);
+static Rect screenshot_rect_land_90(ALS_POS_Y - ALS_RADIUS, 1080 - ALS_POS_X - ALS_RADIUS, ALS_POS_Y + ALS_RADIUS, 1080 - ALS_POS_X + ALS_RADIUS);
+static Rect screenshot_rect_180(1080-ALS_POS_X - ALS_RADIUS, 2400-ALS_POS_Y - ALS_RADIUS, 1080-ALS_POS_X + ALS_RADIUS, 2400-ALS_POS_Y + ALS_RADIUS);
+static Rect screenshot_rect_land_270(2400 - (ALS_POS_Y + ALS_RADIUS),ALS_POS_X - ALS_RADIUS, 2400 - (ALS_POS_Y - ALS_RADIUS), ALS_POS_X + ALS_RADIUS);
 
 void updateScreenBuffer() {
     static time_t lastScreenUpdate = 0;
@@ -61,19 +67,29 @@ void updateScreenBuffer() {
 
     sp<IBinder> display = SurfaceComposerClient::getInternalDisplayToken();
 
+    DisplayState state;
+    SurfaceComposerClient::getDisplayState(display, &state);
+
     DisplayCaptureArgs captureArgs;
-    captureArgs.displayToken = SurfaceComposerClient::getInternalDisplayToken();
+    captureArgs.displayToken = display;
     captureArgs.pixelFormat = PixelFormat::RGBA_8888;
-    captureArgs.sourceCrop = Rect(
-            ALS_POS_X - ALS_RADIUS, ALS_POS_Y - ALS_RADIUS,
-            ALS_POS_X + ALS_RADIUS, ALS_POS_Y + ALS_RADIUS);
-    captureArgs.width = ALS_RADIUS * 2;
-    captureArgs.height = ALS_RADIUS * 2;
+
+    switch (state.orientation) {
+         case Rotation::Rotation90:  captureArgs.sourceCrop = screenshot_rect_land_90;
+                                     break;
+         case Rotation::Rotation180: captureArgs.sourceCrop = screenshot_rect_180;
+                                     break;
+         case Rotation::Rotation270: captureArgs.sourceCrop = screenshot_rect_land_270;
+                                     break;
+         default:                    captureArgs.sourceCrop = screenshot_rect;
+                                     break;
+    }
+    captureArgs.width = screenshot_rect.getWidth();
+    captureArgs.height = screenshot_rect.getHeight();
     captureArgs.useIdentityTransform = true;
     captureArgs.captureSecureLayers = true;
 
-    DisplayState state;
-    SurfaceComposerClient::getDisplayState(display, &state);
+    ALOGV("Using crop windows: left=%d top=%d, right=%d, bottom=%d", captureArgs.sourceCrop.left, captureArgs.sourceCrop.top, captureArgs.sourceCrop.right, captureArgs.sourceCrop.bottom);
 
     sp<AsyncScreenCaptureListener> captureListener = new AsyncScreenCaptureListener(
         [](const ScreenCaptureResults& captureResults) {
