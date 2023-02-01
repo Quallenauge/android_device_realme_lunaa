@@ -47,7 +47,7 @@ void AlsCorrection::init() {
 
     als_bias = 0;
     max_brightness = get("/sys/class/backlight/panel0-backlight/max_brightness", 255);
-    ALOGV("max r = %d, max g = %d, max b = %d", red_max_lux, green_max_lux, blue_max_lux);
+//    ALOGV("max r = %d, max g = %d, max b = %d", red_max_lux, green_max_lux, blue_max_lux);
 }
 
 void AlsCorrection::correct(float& light) {
@@ -55,13 +55,18 @@ void AlsCorrection::correct(float& light) {
     if (pid != 0) {
         kill(pid, SIGUSR1);
     }
+
+    init();
+
     // TODO: HIDL service and pass float instead
     int r = property_get_int32("vendor.sensors.als_correction.r", 0);
     int g = property_get_int32("vendor.sensors.als_correction.g", 0);
     int b = property_get_int32("vendor.sensors.als_correction.b", 0);
-    ALOGV("Screen Color Above Sensor: %d, %d, %d", r, g, b);
-    ALOGV("Original reading: %f", light);
+
     int screen_brightness = get("/sys/class/backlight/panel0-backlight/brightness", 0);
+    ALOGV("Screen Color Above Sensor: %d, %d, %d, brightness: %d", r, g, b, screen_brightness);
+    ALOGV("Original reading: %f", light);
+
     float correction = 0.0f, correction_scaled = 0.0f;
     if (red_max_lux > 0 && green_max_lux > 0 && blue_max_lux > 0 && white_max_lux > 0) {
         constexpr float rgb_scale = 0x7FFFFFFF;
@@ -80,16 +85,20 @@ void AlsCorrection::correct(float& light) {
     }
     if (light - correction >= 0) {
         // Apply correction if light - correction >= 0
+        ALOGV("Apply correction if light - correction >= 0");
         light -= correction;
     } else if (light - correction > -4) {
         // Return positive value if light - correction > -4
+        ALOGV("Return positive value if light - correction > -4");
         light = correction - light;
     } else if (light - correction_scaled >= 0) {
         // Substract scaled correction if light - correction_scaled >= 0
+        ALOGV("Substract scaled correction if light - correction_scaled >= 0");
         light -= correction_scaled;
     } else {
         // In low light conditions, sensor is just reporting bad values, using
         // computed correction instead allows to fix the issue
+        ALOGV("In low light conditions, sensor is just reporting bad values, using computed correction instead allows to fix the issue");
         light = correction;
     }
     ALOGV("Corrected reading: %f", light);

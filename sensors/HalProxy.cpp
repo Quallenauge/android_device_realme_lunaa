@@ -140,7 +140,7 @@ Return<Result> HalProxy::setOperationMode(OperationMode mode) {
     for (subHalIndex = 0; subHalIndex < mSubHalList.size(); subHalIndex++) {
         result = mSubHalList[subHalIndex]->setOperationMode(mode);
         if (result != Result::OK) {
-            ALOGE("setOperationMode failed for SubHal: %s",
+            ALOGV("setOperationMode failed for SubHal: %s",
                   mSubHalList[subHalIndex]->getName().c_str());
             break;
         }
@@ -263,7 +263,7 @@ Return<Result> HalProxy::initializeCommon(
         Result currRes = mSubHalList[i]->initialize(this, this, i);
         if (currRes != Result::OK) {
             result = currRes;
-            ALOGE("Subhal '%s' failed to initialize with reason %" PRId32 ".",
+            ALOGV("Subhal '%s' failed to initialize with reason %" PRId32 ".",
                   mSubHalList[i]->getName().c_str(), static_cast<int32_t>(currRes));
         }
     }
@@ -297,7 +297,7 @@ Return<Result> HalProxy::injectSensorData(const V1_0::Event& event) {
     Result result = Result::OK;
     if (mCurrentOperationMode == OperationMode::NORMAL &&
         event.sensorType != V1_0::SensorType::ADDITIONAL_INFO) {
-        ALOGE("An event with type != ADDITIONAL_INFO passed to injectSensorData while operation"
+        ALOGV("An event with type != ADDITIONAL_INFO passed to injectSensorData while operation"
               " mode was NORMAL.");
         result = Result::BAD_VALUE;
     }
@@ -352,7 +352,7 @@ Return<void> HalProxy::configDirectReport(int32_t sensorHandle, int32_t channelH
 
 Return<void> HalProxy::debug(const hidl_handle& fd, const hidl_vec<hidl_string>& /*args*/) {
     if (fd.getNativeHandle() == nullptr || fd->numFds < 1) {
-        ALOGE("%s: missing fd for writing", __FUNCTION__);
+        ALOGV("%s: missing fd for writing", __FUNCTION__);
         return Void();
     }
 
@@ -399,7 +399,7 @@ Return<void> HalProxy::onDynamicSensorsConnected(const hidl_vec<SensorInfo>& dyn
         std::lock_guard<std::mutex> lock(mDynamicSensorsMutex);
         for (SensorInfo sensor : dynamicSensorsAdded) {
             if (!subHalIndexIsClear(sensor.sensorHandle)) {
-                ALOGE("Dynamic sensor added %s had sensorHandle with first byte not 0.",
+                ALOGV("Dynamic sensor added %s had sensorHandle with first byte not 0.",
                       sensor.name.c_str());
             } else {
                 sensor.sensorHandle = setSubHalIndex(sensor.sensorHandle, subHalIndex);
@@ -420,7 +420,7 @@ Return<void> HalProxy::onDynamicSensorsDisconnected(
         std::lock_guard<std::mutex> lock(mDynamicSensorsMutex);
         for (int32_t sensorHandle : dynamicSensorHandlesRemoved) {
             if (!subHalIndexIsClear(sensorHandle)) {
-                ALOGE("Dynamic sensorHandle removed had first byte not 0.");
+                ALOGV("Dynamic sensorHandle removed had first byte not 0.");
             } else {
                 sensorHandle = setSubHalIndex(sensorHandle, subHalIndex);
                 if (mDynamicSensors.find(sensorHandle) != mDynamicSensors.end()) {
@@ -437,13 +437,13 @@ Return<void> HalProxy::onDynamicSensorsDisconnected(
 void HalProxy::initializeSubHalListFromConfigFile(const char* configFileName) {
     std::ifstream subHalConfigStream(configFileName);
     if (!subHalConfigStream) {
-        ALOGE("Failed to load subHal config file: %s", configFileName);
+        ALOGV("Failed to load subHal config file: %s", configFileName);
     } else {
         std::string subHalLibraryFile;
         while (subHalConfigStream >> subHalLibraryFile) {
             void* handle = getHandleForSubHalSharedObject(subHalLibraryFile);
             if (handle == nullptr) {
-                ALOGE("dlopen failed for library: %s", subHalLibraryFile.c_str());
+                ALOGV("dlopen failed for library: %s", subHalLibraryFile.c_str());
             } else {
                 SensorsHalGetSubHalFunc* sensorsHalGetSubHalPtr =
                         (SensorsHalGetSubHalFunc*)dlsym(handle, "sensorsHalGetSubHal");
@@ -453,7 +453,7 @@ void HalProxy::initializeSubHalListFromConfigFile(const char* configFileName) {
                     uint32_t version;
                     ISensorsSubHalV2_0* subHal = sensorsHalGetSubHal(&version);
                     if (version != SUB_HAL_2_0_VERSION) {
-                        ALOGE("SubHal version was not 2.0 for library: %s",
+                        ALOGV("SubHal version was not 2.0 for library: %s",
                               subHalLibraryFile.c_str());
                     } else {
                         ALOGV("Loaded SubHal from library: %s", subHalLibraryFile.c_str());
@@ -464,7 +464,7 @@ void HalProxy::initializeSubHalListFromConfigFile(const char* configFileName) {
                             (SensorsHalGetSubHalV2_1Func*)dlsym(handle, "sensorsHalGetSubHal_2_1");
 
                     if (getSubHalV2_1Ptr == nullptr) {
-                        ALOGE("Failed to locate sensorsHalGetSubHal function for library: %s",
+                        ALOGV("Failed to locate sensorsHalGetSubHal function for library: %s",
                               subHalLibraryFile.c_str());
                     } else {
                         std::function<SensorsHalGetSubHalV2_1Func> sensorsHalGetSubHal_2_1 =
@@ -472,7 +472,7 @@ void HalProxy::initializeSubHalListFromConfigFile(const char* configFileName) {
                         uint32_t version;
                         ISensorsSubHalV2_1* subHal = sensorsHalGetSubHal_2_1(&version);
                         if (version != SUB_HAL_2_1_VERSION) {
-                            ALOGE("SubHal version was not 2.1 for library: %s",
+                            ALOGV("SubHal version was not 2.1 for library: %s",
                                   subHalLibraryFile.c_str());
                         } else {
                             ALOGV("Loaded SubHal from library: %s", subHalLibraryFile.c_str());
@@ -490,7 +490,7 @@ void HalProxy::initializeSensorList() {
         auto result = mSubHalList[subHalIndex]->getSensorsList([&](const auto& list) {
             for (SensorInfo sensor : list) {
                 if (!subHalIndexIsClear(sensor.sensorHandle)) {
-                    ALOGE("SubHal sensorHandle's first byte was not 0");
+                    ALOGV("SubHal sensorHandle's first byte was not 0");
                 } else {
                     ALOGV("Loaded sensor: %s", sensor.name.c_str());
                     sensor.sensorHandle = setSubHalIndex(sensor.sensorHandle, subHalIndex);
@@ -505,7 +505,7 @@ void HalProxy::initializeSensorList() {
             }
         });
         if (!result.isOk()) {
-            ALOGE("getSensorsList call failed for SubHal: %s",
+            ALOGV("getSensorsList call failed for SubHal: %s",
                   mSubHalList[subHalIndex]->getName().c_str());
         }
     }
@@ -591,7 +591,7 @@ void HalProxy::handlePendingWrites() {
                         static_cast<uint32_t>(EventQueueFlagBits::EVENTS_READ),
                         static_cast<uint32_t>(EventQueueFlagBits::READ_AND_PROCESS),
                         kPendingWriteTimeoutNs, mEventQueueFlag)) {
-                ALOGE("Dropping %zu events after blockingWrite failed.", numToWrite);
+                ALOGV("Dropping %zu events after blockingWrite failed.", numToWrite);
                 if (numWakeupEvents > 0) {
                     if (pendingWriteEvents.size() > eventQueueSize) {
                         decrementRefCountAndMaybeReleaseWakelock(
@@ -720,7 +720,7 @@ void HalProxy::decrementRefCountAndMaybeReleaseWakelock(size_t delta,
     if (!mThreadsRun.load()) return;
     std::lock_guard<std::recursive_mutex> lockGuard(mWakelockMutex);
     if (delta > mWakelockRefCount) {
-        ALOGE("Decrementing wakelock ref count by %zu when count is %zu",
+        ALOGV("Decrementing wakelock ref count by %zu when count is %zu",
               delta, mWakelockRefCount);
     }
     if (timeoutStart == -1) timeoutStart = mWakelockTimeoutResetTime;
