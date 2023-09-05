@@ -99,6 +99,7 @@ odm/etc/lvimfs_params/LVIMFS_Parameter_ID9_MIC_Voice.txt
 odm/etc/bt/msnv11.bin
 
 # Camera
+odm/bin/hw/vendor.oplus.hardware.cammidasservice-V1-service
 odm/etc/camera/aicolor/duallut_background.bmp;MODULE_SUFFIX=.aiboost
 odm/etc/camera/aicolor/duallut_portrait.bmp;MODULE_SUFFIX=.aiboost
 odm/etc/camera/anc/fusion_model
@@ -206,6 +207,7 @@ odm/etc/camera/filters_lut/BeautyplusMellow-5.CUBE.rgb.bin
 odm/etc/camera/filters_lut/ByW7g4bbf
 odm/etc/camera/filters_lut/ByYo3If
 odm/etc/camera/filters_lut/BycYf7WWz
+odm/etc/camera/filters_lut/Cold.cube.rgb.bin
 odm/etc/camera/filters_lut/DL_D_G4.cube.rgb.bin
 odm/etc/camera/filters_lut/DL_L_B6.cube.rgb.bin
 odm/etc/camera/filters_lut/Emerald.cube.rgb.bin
@@ -227,6 +229,8 @@ odm/etc/camera/filters_lut/SnapseedBright.cube.rgb.bin
 odm/etc/camera/filters_lut/SweetSnapAlice-3.CUBE.rgb.bin
 odm/etc/camera/filters_lut/Sy4uLSTgf
 odm/etc/camera/filters_lut/Syt2KeZZf
+odm/etc/camera/filters_lut/Texture-70.cube.rgb.bin
+odm/etc/camera/filters_lut/White.cube.rgb.bin
 odm/etc/camera/filters_lut/V01-landscape-2.6.CUBE.rgb.bin
 odm/etc/camera/filters_lut/V02-portrait-2.5.CUBE.rgb.bin
 odm/etc/camera/filters_lut/V03-food-2.0.CUBE.rgb.bin
@@ -357,6 +361,7 @@ odm/etc/camera/micFilter/blue_pink_3.png
 odm/etc/camera/micFilter/curve_0.png
 odm/etc/camera/micFilter/green_orange_2.png
 odm/etc/camera/micFilter/yellow_green_1.png
+odm/etc/camera/model/license.lic
 odm/etc/camera/model/DocDetectV15.xbin
 odm/etc/camera/motionblur/model.data
 odm/etc/camera/omoji/assets/sdk_assets/ai_face_processor_e47_s1.bundle
@@ -523,6 +528,7 @@ odm/etc/camera/pfb_bin/ThirdPartyPreSkintuneBinary.bin
 odm/etc/camera/pfb_bin/ThirdPartyPreSkintuneMRTBinary.bin
 odm/etc/camera/pfb_bin/ThirdPartyPreVertFilterBinary.bin
 odm/etc/camera/pfb_bin/ThirdPartyPreVertSurBinary.bin
+odm/etc/camera/singleblur/license_release.license
 odm/etc/camera/sticker/material/animoji/data.zip
 odm/etc/camera/sticker/material/animoji/snowleopard_v_0_0_0_9.zip
 odm/etc/camera/sticker/M_SenseME_Action_5.2.12.model
@@ -561,11 +567,15 @@ odm/etc/camera/fb_default
 odm/etc/camera/fdc_cl.cache
 odm/etc/camera/fwk_config.json
 odm/etc/camera/gasryuv_1.2_wp.model
+odm/etc/camera/license_release_fdc.lic
 odm/etc/camera/model_fdc.data
 odm/etc/camera/mtStereoParams.bin
 odm/etc/camera/mwStereoParams.bin
 odm/etc/camera/settings_fdc.txt
 odm/etc/camera/wide.bin
+odm/etc/init/vendor.oplus.hardware.cammidasservice-V1-service.rc
+odm/etc/vintf/manifest/manifest_oplus_cammidasservice_aidl.xml
+odm/etc/vintf/manifest/manifest_oplus_sendextcamcmd.xml
 odm/lib/libDeVIS.so
 odm/lib/libVDBlurlessAPI_v2.so;DISABLE_CHECKELF
 odm/lib/libc++_shared.so
