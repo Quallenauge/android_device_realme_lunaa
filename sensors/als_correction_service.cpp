@@ -63,8 +63,16 @@ class TakeScreenshotCommand : public FrameworkCommand {
         nsecs_t timestamp;
     };
 
+    // See frameworks/base/services/core/jni/com_android_server_display_DisplayControl.cpp and
+    // frameworks/base/core/java/android/view/SurfaceControl.java
+    static sp<IBinder> getInternalDisplayToken() {
+        const auto displayIds = SurfaceComposerClient::getPhysicalDisplayIds();
+        sp<IBinder> token = SurfaceComposerClient::getPhysicalDisplayToken(displayIds[0]);
+        return token;
+    }
+
     screenshot_t takeScreenshot() {
-        sp<IBinder> display = SurfaceComposerClient::getInternalDisplayToken();
+        sp<IBinder> display = getInternalDisplayToken();
 
         android::ui::DisplayState state;
         SurfaceComposerClient::getDisplayState(display, &state);
@@ -97,9 +105,10 @@ class TakeScreenshotCommand : public FrameworkCommand {
         captureArgs.height = screenshot_rect.getHeight();
         captureArgs.useIdentityTransform = false;
         status_t ret = ScreenshotClient::captureDisplay(captureArgs, captureListener);
-        if (ret == NO_ERROR) {
+        if (ret == android::NO_ERROR) {
             captureResults = captureListener->waitForResults();
-            if (captureResults.result == NO_ERROR)  outBuffer = captureResults.buffer;
+            ALOGV("Capture results received");
+            if (captureResults.fenceResult.ok()) outBuffer = captureResults.buffer;
         }
 
         uint8_t *out;
