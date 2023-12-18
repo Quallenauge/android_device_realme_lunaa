@@ -31,11 +31,8 @@ public:
             : callback(callback), timeout(timeout) {}
 
     binder::Status onScreenCaptureCompleted(const ScreenCaptureResults& captureResults) override {
-        if (captureResults.fenceResult.ok()) {
-            if (captureResults.fenceResult.value()->wait(timeout) == OK) {
-                    callback(captureResults);
-            }
-        }
+        if (captureResults.fence->wait(timeout) == NO_ERROR)
+            callback(captureResults);
         return binder::Status::ok();
     }
 
