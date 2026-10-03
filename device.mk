@@ -67,7 +67,10 @@ PRODUCT_PACKAGES += \
 
 # Sensors
 PRODUCT_PACKAGES += \
-    vendor.lineage.oplus_als.service
+    sensors.fusionlight_legacy
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/sensors/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf
 
 # Power
 PRODUCT_COPY_FILES += \
