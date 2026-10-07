@@ -1,3 +1,6 @@
 # Camera
 ro.camera.lens_distortion.2=-0.920883,0.252891,-0.003773,-0.907335,0.242135
 ro.camera.lens_intrinsics.2=1482.14,1482.14,1633.26,1231.25,0
+persist.vendor.camera.fullres.ids=5=0
+persist.vendor.camera.fullres.package_name=com.oplus.camera
+persist.vendor.camera.fullres.packages=org.codeaurora.snapcam
