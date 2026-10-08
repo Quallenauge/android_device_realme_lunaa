@@ -94,6 +94,29 @@ def blob_fixup_chi_debug_data_buffer(
         f.write(new)
 
 
+def blob_fixup_mpbase_alloc_padding(
+    ctx: BlobFixupCtx,
+    file: File,
+    file_path: str,
+    *args,
+    **kwargs,
+):
+    # The bokeh engine of the portrait mode (libarcsoft_dualcam_refocus_left.so) reads up to
+    # 8 bytes past the end of a buffer it gets from MMemAlloc. Scudo ends large allocations at a
+    # guard page, so the camera app crashed on every portrait capture. Pad the allocations:
+    #   MMemAlloc: cbz x0, 1f; b MMemAllocStatic
+    #   1: mov x0, x1  ->  add x0, x1, #0x40
+    #      b malloc
+    old = bytes.fromhex('400000b4deffff17e00301aaadffff17')
+    new = bytes.fromhex('400000b4deffff1720000191adffff17')
+
+    with open(file_path, 'rb+') as f:
+        data = f.read()
+        assert data.count(old) == 1, 'MMemAlloc not found'
+        f.seek(data.index(old))
+        f.write(new)
+
+
 def blob_fixup_tuning_full_res_tone_mapping(
     ctx: BlobFixupCtx,
     file: File,
@@ -204,6 +227,8 @@ blob_fixups: blob_fixups_user_type = {
         .clear_symbol_version('AHardwareBuffer_lock')
         .clear_symbol_version('AHardwareBuffer_release')
         .clear_symbol_version('AHardwareBuffer_unlock'),
+    'odm/lib64/libmpbase.so': blob_fixup()
+        .call(blob_fixup_mpbase_alloc_padding),
     'vendor/etc/libnfc-hal-st.conf':  blob_fixup()
         .regex_replace('NFC_DEBUG_ENABLED=1', 'NFC_DEBUG_ENABLED=0')
         .regex_replace('STNFC_FW_PATH_STORAGE="/data/vendor/nfc/"', 'STNFC_FW_PATH_STORAGE="/vendor/firmware/"')
