@@ -31,6 +31,10 @@ PRODUCT_COPY_FILES += \
 
 $(call inherit-product-if-exists, vendor/oplus/camera/opluscamera.mk)
 
+VIVO_CAMERA_MODULE_CONFIG := vendor/vivo/camera/configs/camera/camera_config_lunaa.xml
+VIVO_CAMERA_PLATFORM := SM7325
+$(call inherit-product-if-exists, vendor/vivo/camera/vivocamera.mk)
+
 # Display
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/display_id_4630946741972277890.xml:$(TARGET_COPY_OUT_VENDOR)/etc/displayconfig/display_id_4630946741972277890.xml
