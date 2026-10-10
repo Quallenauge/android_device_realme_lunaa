@@ -32,7 +32,9 @@ PRODUCT_COPY_FILES += \
 $(call inherit-product-if-exists, vendor/oplus/camera/opluscamera.mk)
 
 VIVO_CAMERA_MODULE_CONFIG := vendor/vivo/camera/configs/camera/camera_config_lunaa.xml
+VIVO_CAMERA_MODEL := PD2283
 VIVO_CAMERA_PLATFORM := SM7325
+VIVO_CAMERA_VENDOR_TAG_COMPAT := vendor/vivo/camera/configs/camera/vendor_tag_compat_lunaa.conf
 $(call inherit-product-if-exists, vendor/vivo/camera/vivocamera.mk)
 
 # Display
