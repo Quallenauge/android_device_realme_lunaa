@@ -35,6 +35,7 @@ VIVO_CAMERA_MODULE_CONFIG := vendor/vivo/camera/configs/camera/camera_config_lun
 VIVO_CAMERA_MODEL := lunaa
 VIVO_CAMERA_PLATFORM := SM7325
 VIVO_CAMERA_VENDOR_TAG_COMPAT := vendor/vivo/camera/configs/camera/vendor_tag_compat_lunaa.conf
+VIVO_CAMERA_VIDEO_OPMODE := 32810
 $(call inherit-product-if-exists, vendor/vivo/camera/vivocamera.mk)
 
 # Display
