@@ -9,6 +9,11 @@ include device/oneplus/sm8350-common/BoardConfigCommon.mk
 
 DEVICE_PATH := device/realme/lunaa
 
+# Camera
+# vendor/vivo/camera copies the files of vivo's algorithm provider, among them
+# libraries in /vendor/npu/lib, for which there is no prebuilt module type.
+BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
+
 # Display
 SOONG_CONFIG_qtidisplay_udfps := true
 TARGET_SCREEN_DENSITY := 450

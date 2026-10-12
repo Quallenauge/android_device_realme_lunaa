@@ -202,7 +202,14 @@ def blob_fixup_tuning_full_res_tone_mapping(
 
 blob_fixups: blob_fixups_user_type = {
     'odm/etc/camera/CameraHWConfiguration.config': blob_fixup()
-        .regex_replace('SystemCamera =  0;  0;  1;  1;  1', 'SystemCamera =  0;  0;  0;  0;  1'),
+        .regex_replace('SystemCamera =  0;  0;  1;  1;  1', 'SystemCamera =  0;  0;  0;  0;  1')
+        # A normal session with a preview and two YUV streams gets the ZSL usecase
+        # instead of UsecaseSnapshot, whose pipeline has no face detection
+        .regex_replace(
+            r'(    isMatch\[5\][^\n]*\n)',
+            r'\1    isMatch[6]  =    0x0000;               3;             0x0007'
+            r'       # preview and two YUV streams of other apps\n',
+        ),
     ('odm/lib/liblvimfs_wrapper.so', 'odm/lib64/libCOppLceTonemapAPI.so', 'odm/lib64/libaps_frame_registration.so'): blob_fixup()
         .replace_needed('libstdc++.so', 'libstdc++_vendor.so'),
     ('odm/lib64/libarcsoft_high_dynamic_range_v4.so', 'odm/lib64/libarcsoft_portrait_super_night_raw.so'): blob_fixup()
