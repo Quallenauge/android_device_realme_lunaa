@@ -1,0 +1,2 @@
+# NNAPI HAL back-ends, loaded into the service process
+/vendor/lib(64)?/unnhal-acc-(common|gpu|htp)\.so    u:object_r:same_process_hal_file:s0

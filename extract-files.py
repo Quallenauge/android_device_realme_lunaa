@@ -236,6 +236,8 @@ blob_fixups: blob_fixups_user_type = {
         .clear_symbol_version('AHardwareBuffer_unlock'),
     'odm/lib64/libmpbase.so': blob_fixup()
         .call(blob_fixup_mpbase_alloc_padding),
+    'vendor/etc/init/android.hardware.neuralnetworks@1.3-service-qti.rc': blob_fixup()
+        .regex_replace(r'\s*writepid /dev/stune/nnapi-hal/tasks', ''),
     'vendor/etc/libnfc-hal-st.conf':  blob_fixup()
         .regex_replace('NFC_DEBUG_ENABLED=1', 'NFC_DEBUG_ENABLED=0')
         .regex_replace('STNFC_FW_PATH_STORAGE="/data/vendor/nfc/"', 'STNFC_FW_PATH_STORAGE="/vendor/firmware/"')
