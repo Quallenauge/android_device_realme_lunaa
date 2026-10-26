@@ -1,0 +1,2 @@
+# Per-thread scheduling QoS of the kernel (/proc/sched_qos)
+type proc_sched_qos, fs_type, proc_type;

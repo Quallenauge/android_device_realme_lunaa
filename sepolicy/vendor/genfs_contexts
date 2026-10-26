@@ -1,0 +1,1 @@
+genfscon proc /sched_qos u:object_r:proc_sched_qos:s0
