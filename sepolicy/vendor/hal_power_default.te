@@ -1,3 +1,6 @@
+# App processes carry MLS categories
+typeattribute hal_power_default mlstrustedsubject;
+
 # Set scheduling info for apps (for adpf)
 allow hal_power_default appdomain:process { getsched setsched };
 allow hal_power_default self:capability sys_nice;
